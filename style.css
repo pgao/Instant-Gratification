@@ -1,0 +1,171 @@
+@charset "utf-8";
+
+    a:link {
+        color: gray;
+        text-decoration: none
+    }
+
+    a:visited {
+        color: gray;
+        text-decoration: none;
+    }
+
+    a:hover {
+        color: blue;
+        cursor: hand;
+        cursor: pointer;
+    }
+
+    #title {
+        font-size: 30px;
+        font-family: 'Fenix', serif;
+        margin-left: 50px;
+        margin-top: 30px;
+    }
+
+    #description {
+        font-family: 'Scada', sans-serif;
+        margin-left: 50px;
+    }
+
+    #quote {
+        font-family: 'Jacques Francois', serif;
+        font-size: 30px;
+        width: 1050px;
+        height: 250px;
+        margin: 0 auto;
+        /* margin-top: 100px; */
+        margin-bottom: 100px;
+        position: relative;
+    }
+
+    #searchResults {
+        margin-top: 10px;
+    }
+
+    .button1 {
+        height: 40px;
+        width: 270px;
+        background: white;
+        font-size: 30px;
+        letter-spacing: -0.02em;
+        text-align: center;
+        text-decoration: none;
+        font-family: 'Maven Pro', sans-serif;
+        margin: auto auto;
+
+        border-radius: 10px;
+
+        padding-top: 7px;
+        padding-bottom: 7px;
+
+        transition: background-color 1s;
+        -moz-transition: background-color 1s;
+        -webkit-transition: background-color 1s;
+        -o-transition: background-color 1s;
+
+        -moz-user-select: -moz-none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+
+        -webkit-font-smoothing: subpixel-antialiased;
+
+        color: white;
+        background-color: #34495e;
+    }
+
+    .button1:hover {
+        background-color: #d43f3a;
+        cursor: hand;
+        cursor: pointer;
+
+        transition: background-color 1s;
+        -moz-transition: background-color 1s;
+        -webkit-transition: background-color 1s;
+        -o-transition: background-color 1s;
+    }
+
+    .button2 {
+        height: 40px;
+        width: 100px;
+        background: white;
+        font-size: 15px;
+        letter-spacing: -0.02em;
+        line-height: 10px;
+        text-align: center;
+        color: gray;
+        text-decoration: none;
+        font-family: "Fenix";
+        margin-top: 10px;
+        position: relative;
+        float: left;
+        margin-right: 30px;
+    }
+
+    .button2:hover {
+        color: blue;
+        cursor: hand;
+        cursor: pointer;
+    }
+
+    .checkbox {
+        color: gray;
+        float: right;
+    }
+
+    .searchBar {
+        width: 500px;
+        height: 30px;
+        border-radius: 5px;
+        padding: 3px 3px 3px 8px;
+        font-family: "Fenix";
+        float: left;
+    }
+
+    #tryfilter {
+        height: 40px;
+        width: 100px;
+        background: white;
+        font-size: 15px;
+        letter-spacing: -0.02em;
+        line-height: 10px;
+        text-align: center;
+        color: black;
+        text-decoration: none;
+        font-family: "Jacques Francois";
+        margin-top: 10px;
+        position: relative;
+        float: right;
+        margin-right: 0px;
+    }
+
+    .filters {
+        font-family: "Fenix";
+
+        float: right;
+        padding:3px;
+        margin: 0;
+        -webkit-border-radius:4px;
+        -moz-border-radius:4px;
+        border-radius:4px;
+        -webkit-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+        -moz-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+        box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+        background: transparent;
+        color:black;
+        border:none;
+        outline:none;
+        display: inline-block;
+        -webkit-appearance:none;
+        -moz-appearance:none;
+        appearance:none;
+        cursor:pointer;
+        margin-right: 20px;
+    }
+
+    span {
+        display: inline-block;
+        vertical-align: middle;
+        line-height: normal;
+    }

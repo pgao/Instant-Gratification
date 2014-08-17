@@ -1,0 +1,419 @@
+<html>
+
+    <meta property="og:title" content="Instant Gratification" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://instantgratification.herokuapp.com/" />
+    <meta property="og:image" content="http://www.gaoism.com/pics/Projects/InstantGratification.jpg" />
+    <meta property="og:site_name" content="Instant Gratification" />
+    <meta property="fb:admins" content="713776007" />
+    <meta property="og:description"
+          content="The next step in time-wasting technology."/>
+
+    <link href="style.css" rel="stylesheet" type="text/css">
+
+    <link href='http://fonts.googleapis.com/css?family=Fenix' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Scada' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro:900' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Jacques+Francois' rel='stylesheet' type='text/css'>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-37119700-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+    <head>
+        <title>Instant Gratification.</title>
+    </head>
+
+    
+
+    <script type = "text/javascript">
+        var quoteElem;
+        var histElem;
+        var bonusElem;
+        var searchElem;
+        var descriptions = [
+            "An unhealthy mix of wit, wisdom, and dick jokes.",
+            "Better than breakfast, and by extension, sliced bread.",
+            "You're supposed to make this your homepage.",
+            "\"That's such a stupid idea,\" they said.  \"Nobody wants to look at shitty photos of your food,\" they said.",
+            "lik dis if u cry evertim",
+            "Some CS majors know more about nihilism than philosophy majors.",
+            "Yeah, fuck Stanford.",
+            "Say goodbye to a few hours.",
+            "No, the profanity filter is not broken.  You're just not reading it correctly.",
+            "I was originally going to call this \"Instagrat\".",
+            "Eh, fuck tha police.",
+            "Haters gonna hate.",
+            "If just one human being is inspired to say something nasty to a friend, or perhaps to strike a loved one, it will all have been worth the while.",
+            '<a href="http://www.gaoism.com">Call me baby.</a>'
+        ];
+        var viewedDescriptions = [];
+        var quoteHistory = [];
+
+        $(document).ready(function() {
+            quoteElem = document.getElementById("quote");
+            histElem = document.getElementById("quoteHistory");
+            bonusElem = document.getElementById("bonus");
+            searchElem = document.getElementById("searchResults");
+            quoteHistory = [];
+
+            $("#search-string").bind("keypress", {}, keypressInBox);
+
+            function keypressInBox(e) {
+                var code = (e.keyCode ? e.keyCode : e.which);
+                if (code == 13) { //Enter keycode                        
+                    e.preventDefault();
+                    search();
+                }
+            };
+
+            var rand = Math.random();
+            rand *= descriptions.length;
+            rand = Math.floor(rand);
+            document.getElementById("description").innerHTML = "(" + descriptions[rand] + ")";
+            viewedDescriptions.push(descriptions[rand])
+
+            if (quoteElem.innerHTML == "") {
+                newQuote();
+            }
+            
+        })
+
+        function changeDescription() {
+            var rand = Math.random();
+            rand *= descriptions.length;
+            rand = Math.floor(rand);
+            
+            document.getElementById("description").innerHTML = "(" + descriptions[rand] + ")";
+        }
+
+        function newQuote() {
+            var filterVal = document.getElementById("filter").value;
+            var url
+            if (filterVal == "unfiltered") {
+                url = "more/";
+            }
+            else if (filterVal == "profanity") {
+                url = "profane/";
+            }
+            else if (filterVal == "link") {
+                url = "link/";
+            }
+            else if (filterVal == "quote") {
+                url = "quote/";
+            }
+            else if (filterVal == "music") {
+                url = "music/";
+            }
+            else if (filterVal == "new") {
+                url = "new/";
+            }
+            
+
+            $.getJSON(url, function(data) {
+                if ($.inArray(data.quotes[0], quoteHistory) != -1 || data.quotes[0].length > 1000 || data.quotes[0].length < 2 || data.quotes[0].charAt(data.quotes[0].length-1) == ':') {
+                    newQuote();
+                }
+                else {
+                    if (typeof(twttr) != 'undefined') {
+                        twttr.ready(function(twttr) {
+                            // Remove existing iframe
+                            $('#tweetBtn iframe').remove();
+                            // Generate new markup  
+                            var tweetBtn = $('<a></a>')
+                                .addClass('twitter-share-button')
+                                .attr('href', 'http://twitter.com/share')
+                                .attr('data-text', data.quotes[0]);
+                            $('#tweetBtn').append(tweetBtn);
+                            twttr.widgets.load();
+                        });
+                    }
+                    
+                    var rand = Math.random();
+                    if(rand >= 0.2) {
+                        changeDescription();
+                    }
+
+                    if (data.hash != null) {
+                        // IMPLEMENT QUOTE BOOKMARKING
+                        // parent.location.hash = data.hash;
+                        // window.history.pushState(null, null, 'get/' + data.hash);
+                        // window.location.replace(window.location.pathname + 'get/' + data.hash);
+                    }
+                    insertQuotes(data.quotes);
+                }
+            });
+
+            
+        }
+
+        function search() {
+            var searchString = document.getElementById("search-string").value;
+            if (searchString != "") {
+                $.getJSON("search/" + searchString, function(data) {
+                    insertSearchResults(data.quotes);
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
+            }
+            else {
+                searchElem.innerHTML = "";
+            }
+        }
+
+        function clearSearch() {
+            searchElem.innerHTML = "";
+        }
+
+        function insertSearchResults(quotes) {
+            searchElem.innerHTML = "<br><br>";
+            for(i = 0; i < quotes.length; i++) {
+                if(quotes[i].indexOf("http://") != -1 || quotes[i].indexOf("https://") != -1 || quotes[i].indexOf("www.") != -1) {
+                    var link = quotes[i].substring(quotes[i].indexOf("http://"));
+                    if(quotes[i].indexOf("https://") != -1) {
+                        link = quotes[i].substring(quotes[i].indexOf("https://"));
+                    }
+                    searchElem.innerHTML += "<p style=\"font-size: 12px; text-align: left;\"><a href=\"" + link + "\" target=\"_blank\">" + quotes[i] + "</a></p>";
+                }
+                else {
+                    searchElem.innerHTML += "<p style=\"font-size: 12px; text-align: left;\">" + quotes[i] + "</p>";
+                }
+            }
+            if(quotes.length == 0) {
+                searchElem.innerHtml += "<p style=\"font-size: 12px; text-align: left;\">No search results found.</p>";
+            }
+        }
+
+        function insertQuotes(quotes) {
+            quoteElem.innerHTML = "";
+            bonusElem.innerHTML = "";
+            quoteElem.setAttribute("style", "text-align: left; height: 385px;");
+            quoteElem.parentNode.setAttribute("style", "height: 385px");
+
+            console.log(quotes[0]);
+            for (i = 0; i < quotes.length; i++) {
+                quotes[i] = quotes[i].split('\n').join('<br>');
+                quoteHistory.push(quotes[i]);
+                if(quotes[i].indexOf("http://") != -1 || quotes[i].indexOf("https://") != -1) {
+                    var link = quotes[i].substring(quotes[i].indexOf("http://"));
+                    if(quotes[i].indexOf("https://") != -1) {
+                        link = quotes[i].substring(quotes[i].indexOf("https://"));
+                    }
+
+                    if (link.indexOf("youtube.com") != -1 || link.indexOf("youtu.be") != -1) {
+                        var processedLink = link;
+
+                        if(processedLink.indexOf("feature=") != -1) {
+                            processedLink = processedLink.substring(0, processedLink.indexOf("feature="));
+                        }
+                        if(processedLink.indexOf("#t=") != -1) {
+                            processedLink = processedLink.substring(0, processedLink.indexOf("#t="));
+                        }
+                        if(processedLink.indexOf("ob=") != -1) {
+                            processedLink = processedLink.substring(0, processedLink.indexOf("ob="))
+                        }
+
+                        processedLink = processedLink.replace(/(\/watch\?)|(=)/gm, "/");
+
+                        
+                        var processedLink = processedLink.replace("feature=player_embedded", "");
+                        string = '<iframe class="youtube-player" type="text/html" width="640" height="385" src="' + processedLink + '" frameborder="0"></iframe><br><p><a href="' + link + '" target="_blank">' + quotes[i] + '</a></p>';
+
+                        /*
+                        var yturl= /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([\w\-]{10,12})(?:&feature=related)?(?:[\w\-]{0})?/g;
+                        string = '<iframe width="640" height="385" src="http://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe><br><p><a href="' + link + '" target="_blank">' + quotes[i] + '</a></p>';
+                        string = str.replace(yturl, string);
+                        */
+
+                        quoteElem.setAttribute("style", "text-align: center; margin-top: 30px; height: 445px; font-size: 15px");
+                        quoteElem.parentNode.setAttribute("style", "height: 445px;");
+                    }
+                    else if (quotes[i].indexOf(".jpg") != -1 || quotes[i].indexOf(".png") != -1 || quotes[i].indexOf(".gif") != -1 || quotes[i].indexOf("i.imgur.com") != -1) {
+                        string = '<img src="' + link + '" height="385" width="640"></img><br><p><a href="' + link + '" target="_blank" style="font-size: 20px">' + quotes[i] + '</a></p>';
+                        quoteElem.setAttribute("style", "text-align: center; margin-top: 30px; height: 445px; font-size: 10px");
+                        quoteElem.parentNode.setAttribute("style", "height: 445px;");
+                    }
+                    else {
+                        if (quotes[i].length < 30) {
+                            string = '<p><a href="' + link + '" target="_blank" style="font-size: 40px"><span>' + quotes[i] + '</span></a></p>';    
+                        }
+                        else if (quotes[i].length < 60) {
+                            string = '<p><a href="' + link + '" target="_blank" style="font-size: 35px"><span>' + quotes[i] + '</span></a></p>';
+                        }
+                        else if (quotes[i].length < 85) {
+                            string = '<p><a href="' + link + '" target="_blank" style="font-size: 30px"><span>' + quotes[i] + '</span></a></p>';
+                        }
+                        else if (quotes[i].length < 200) {
+                            string = '<p><a href="' + link + '" target="_blank" style="font-size: 25px"><span>' + quotes[i] + '</span></a></p>';
+                        }
+                        else if (quotes[i].length < 300) {
+                            string = '<p><a href="' + link + '" target="_blank" style="font-size: 20px"><span>' + quotes[i] + '</span></a></p>';
+                        }
+                        else if (quotes[i].length < 600) {
+                            string = '<p><a href="' + link + '" target="_blank" style="font-size: 15px"><span>' + quotes[i] + '</span></a></p>';
+                        }
+                        else if (quotes[i].length > 800) {
+                            string = '<p><a href="' + link + '" target="_blank" style="font-size: 10px"><span>' + quotes[i] + '</span></a></p>';
+                        }
+                        quoteElem.setAttribute("style", "text-align: center; margin-top: 90px; height: 385px; font-size: 10px");
+                        quoteElem.parentNode.setAttribute("style", "height: 385px;");
+                    }
+                    quoteElem.innerHTML += string;
+                }
+                else {
+                    //append to history
+                    quoteElem.setAttribute("style", "margin-top: 90px");
+                    if (quotes[i].length < 30) {
+                        quoteElem.innerHTML += "<p style=\"font-size: 70px; text-align: center;\"><span>" + quotes[i] + "</span></p>";
+                    }
+                    else if (quotes[i].length < 60) {
+                        quoteElem.innerHTML += "<p style=\"font-size: 55px; text-align: center;\"><span>" + quotes[i] + "</span></p>";
+                    }
+                    else if (quotes[i].length < 85) {
+                        quoteElem.innerHTML += "<p style=\"font-size: 40px; text-align: center;\"><span>" + quotes[i] + "</span></p>";
+                    }
+                    else if (quotes[i].length < 200) {
+                        quoteElem.innerHTML += "<p style=\"font-size: 30px;\"><span>" + quotes[i] + "</span></p>";
+                    }
+                    else if (quotes[i].length > 300) {
+                        quoteElem.innerHTML += "<p style=\"font-size: 20;\"><span>" + quotes[i] + "</span></p>";
+                    }
+                    else if (quotes[i].length > 600) {
+                        quoteElem.setAttribute("style", "margin-top: 80px");
+                        quoteElem.innerHTML += "<p style=\"font-size: 20;\"><span>" + quotes[i] + "</span></p>";
+                    }
+                    else if (quotes[i].length > 800) {
+                        quoteElem.setAttribute("style", "margin-top: 50px");
+                        quoteElem.innerHTML += "<p style=\"font-size: 15;\"><span>" + quotes[i] + "</span></p>";
+                    }
+                    else if (quotes[i].length > 1000) {
+                        quoteElem.setAttribute("style", "margin-top: 50px");
+                        quoteElem.innerHTML += "<p style=\"font-size: 10;\"><span>" + quotes[i] + "</span></p>";
+                    }
+                    else {
+                        quoteElem.innerHTML += "<p>" + quotes[i] + "</p>";
+                    }
+                }
+            }
+            /*
+            var rand = Math.random();
+            images = [
+                "http://i.imgur.com/mUudk.jpg",
+                "http://media.giantbomb.com/uploads/4/49617/2284744-gangnam_style.png"
+            ]
+            if (rand <= 0.05) {
+                rand = Math.random();
+                rand *= images.length;
+                rand = Math.floor(rand);
+                if(images[rand].indexOf("mUudk") != 0) {
+                    document.getElementById("bonus").innerHTML = '<br><br><br><br><br><br><center><img src="' + images[rand] + '" width="820" height="537"></img></center>';
+                }
+                else {
+                    document.getElementById("bonus").innerHTML = '<br><br><br><br><br><br><center><img src="' + images[rand] + '"></img></center>';
+                }
+            }
+            */
+        }
+
+        function seeHistory() {
+            histElem.innerHTML = "";
+            console.log("history is ", quoteHistory);
+            for (i = quoteHistory.length - 1; i >= 0; i--) {
+                if(quoteHistory[i].indexOf("http://") != -1 || quoteHistory[i].indexOf("https://") != -1 || quoteHistory[i].indexOf("www.") != -1) {
+                    var link = quoteHistory[i].substring(quoteHistory[i].indexOf("http://"));
+                    if(quoteHistory[i].indexOf("https://") != -1) {
+                        link = quoteHistory[i].substring(quoteHistory[i].indexOf("https://"));
+                    }
+                    //console.log("quoteHistory entry is " + quoteHistory[i]);
+                    histElem.innerHTML += "<p><a href=\"" + link + "\" target=\"_blank\">" + quoteHistory[i] + "</a></p>";
+                }
+                else {
+                    histElem.innerHTML += "<p>" + quoteHistory[i] + "</p>"
+                }
+            }
+        }
+
+        function hideHistory() {
+            histElem.innerHTML = "";
+        }
+
+        function clearHistory() {
+            hideHistory();
+            quoteHistory = [];
+        }
+    </script>
+
+    <body>
+
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=426087870785433";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+
+        <div id="title">
+            Instant Gratification.
+        </div>
+        <div id="description">
+
+        </div>
+
+        <br>
+
+        <div>
+            <div id="quote"></div>
+        </div>
+        <div class="button1" onclick="newQuote()"> GIVE ME MOAR </div>
+
+        <br>
+        <br>
+        <div class="button2" onclick="seeHistory()">See history</div>
+        <div class="button2" onclick="hideHistory()">Hide history</div>
+        <div class="button2" onclick="clearHistory()">Clear history</div>
+        <div class="button2"><a href="http://db.tt/IIXOzmta" target="_blank">See All Quotes</a></div>
+        <div class="button2"><a href="http://db.tt/TZJHbJwz" target="_blank">See All Music</a></div>
+        <select id="filter" class="filters">
+            <option value="unfiltered">No filter</input>
+            <option value="profanity">Profanity filter</input>
+            <option value="link">Link filter</input>
+            <option value="quote">Quote filter</input>
+            <option value="music">Music filter</input>
+            <option value="new">New filter</input>
+        </select>
+        <div id="tryfilter">Try a filter! </div>
+        <br>
+        <br>
+
+        <div id="tweetBtn" style="float: right; margin-right: 18px; width: 80px;">
+            <a href="https://twitter.com/share" class="twitter-share-button" data-text="REPLACEME" style="float: right; margin-right: 18px; width: 80px;" data-lang="en" data-count="vertical">Tweet This Quote</a>
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+        </div>  
+
+        <div class="fb-like" data-href="http://instantgratification.herokuapp.com/" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false" style="float:right; margin-right: 20px;"></div>
+        <div id="quoteHistory"></div>
+        <br>
+        <input type="text" id="search-string" class="searchBar" placeholder="Search for a quote" />
+        <div class="button2" onclick="search()" style="margin-right: 5px; border: black 1px">Search</div>
+        <div class="button2" onclick="clearSearch()">Clear results</div>
+        <div id="searchResults"></div>
+        <br>
+        <div id="bonus"></div>
+
+
+    </body>
+
+</html>
